@@ -2,22 +2,10 @@
 
 This project is a web scraper designed to retrieve and store the Amazon bestsellers in the DIY category. The scraper saves the data to a SQLite database and runs daily on PythonAnywhere.
 
-## Directory Structure
-repository/
-│
-├── lib_py/
-│ ├── scraping_amazonranking.py
-│ ├── dwh_amazonranking.py
-│
-├── run.sh
-├── README.md
-└── data-lake/
-└── imported/
-
+The goal of this project is to monitor the Amazon ranking of a specific product to perform analyses and predictions.
 
 ## Files Description
 
-- **notebooks/**: Directory for Jupyter notebooks (if any).
 - **lib_py/scraping_amazonranking.py**: Python script to scrape Amazon bestsellers.
 - **lib_py/dwh_amazonranking.py**: Python script to process and store scraped data into SQLite database.
 - **run.sh**: Shell script to run the scraper and update the database.
@@ -38,20 +26,3 @@ repository/
     ```bash
     bash run.sh
     ```
-
-## Scheduling on PythonAnywhere
-
-1. **Login to PythonAnywhere**.
-2. **Clone the repository** and navigate to the directory:
-    ```bash
-    git clone https://github.com/username/repository.git
-    cd repository
-    ```
-3. **Schedule a daily task**:
-    - Go to the "Tasks" section on the PythonAnywhere dashboard.
-    - Schedule a new task with the following command:
-      ```bash
-      bash /home/username/repository/run.sh
-      ```
-
-This will ensure that your scraper runs daily and updates the database with the latest Amazon bestseller data.
