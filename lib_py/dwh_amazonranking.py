@@ -19,13 +19,13 @@ def create_soup(html_content):
 def extract_data(soup):
     data = []
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
-    rank_elements = soup.find_all("span", class_="zg-badge-text")
-    for rank_element in rank_elements:
-        rank = rank_element.get_text(strip=True).replace("#", "")
-        asin_element = rank_element.find_next("div", class_="zg-item")
-        if asin_element and "data-asin" in asin_element.attrs:
-            asin = asin_element["data-asin"]
+
+    # Beispielhafter Scraping-Code, anpassen nach Bedarf
+    for item in soup.select('.zg-item'):
+        rank = item.select_one('.zg-badge-text')
+        asin = item.get('data-asin')
+        if rank and asin:
+            rank = rank.get_text(strip=True).replace("#", "")
             data.append([rank, asin, now])
     
     print(f"[DEBUG] Extracted data: {data}")  # Debugging-Ausgabe
