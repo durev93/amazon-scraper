@@ -6,10 +6,10 @@ from datetime import datetime
 
 # Pfad angeben
 data_lake = "./data-lake"
-output = "./output"
-imported = os.path.join(data_lake, "imported")
-os.makedirs(imported, exist_ok=True)
-os.makedirs(output, exist_ok=True)
+output_dir = "./output"
+imported_dir = os.path.join(data_lake, "imported")
+os.makedirs(imported_dir, exist_ok=True)
+os.makedirs(output_dir, exist_ok=True)
 
 # BeautifulSoup-Objekt erstellen
 def create_soup(html_content):
@@ -27,20 +27,29 @@ def extract_data(soup):
         if asin_element and "data-asin" in asin_element.attrs:
             asin = asin_element["data-asin"]
             data.append([rank, asin, now])
+    
+    print(f"[DEBUG] Extracted data: {data}")  # Debugging-Ausgabe
     return data
 
 # DataFrame erstellen und in SQLite-Datenbank speichern
 def create_dataframe_and_save_to_db(data):
+    if not data:
+        print("[DEBUG] No data to save.")
+        return
+    
     df = pd.DataFrame(data, columns=["Rank", "ASIN", "Timestamp"])
-    db_filename = os.path.join(output, "amazon_analytics.db")
+    db_filename = os.path.join(output_dir, "amazon_analytics.db")
     conn = sqlite3.connect(db_filename)
+    
+    print(f"[DEBUG] Saving DataFrame to database: {df}")  # Debugging-Ausgabe
     df.to_sql("bestsellers", conn, if_exists="append", index=False)
     conn.close()
 
 # HTML-Datei in den "imported"-Ordner verschieben
 def move_html_to_imported(website_path):
-    new_path = os.path.join(imported, os.path.basename(website_path))
+    new_path = os.path.join(imported_dir, os.path.basename(website_path))
     os.rename(website_path, new_path)
+    print(f"[DEBUG] Moved {website_path} to {new_path}")  # Debugging-Ausgabe
 
 # Hauptfunktion
 def main():
