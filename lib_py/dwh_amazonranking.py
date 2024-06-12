@@ -4,7 +4,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime
 
-# Pfad angeben
+# Pfade angeben
 data_lake = "./data-lake"
 output_dir = "./output"
 imported_dir = os.path.join(data_lake, "imported")
@@ -35,15 +35,21 @@ def extract_data(soup):
 def create_dataframe_and_save_to_db(data):
     if not data:
         print("[DEBUG] No data to save.")
-        return
+        return False
     
     df = pd.DataFrame(data, columns=["Rank", "ASIN", "Timestamp"])
     db_filename = os.path.join(output_dir, "amazon_analytics.db")
     conn = sqlite3.connect(db_filename)
     
-    print(f"[DEBUG] Saving DataFrame to database: {df}")  # Debugging-Ausgabe
-    df.to_sql("bestsellers", conn, if_exists="append", index=False)
-    conn.close()
+    try:
+        print(f"[DEBUG] Saving DataFrame to database: {df}")  # Debugging-Ausgabe
+        df.to_sql("bestsellers", conn, if_exists="append", index=False)
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"[ERROR] Failed to save data to database: {e}")
+        conn.close()
+        return False
 
 # HTML-Datei in den "imported"-Ordner verschieben
 def move_html_to_imported(website_path):
@@ -62,8 +68,12 @@ def main():
         
         soup = create_soup(html_content)
         data = extract_data(soup)
-        create_dataframe_and_save_to_db(data)
-        move_html_to_imported(website_path)
+        
+        # Nur verschieben, wenn die Daten erfolgreich gespeichert wurden
+        if create_dataframe_and_save_to_db(data):
+            move_html_to_imported(website_path)
+        else:
+            print(f"[ERROR] Failed to process {website_path}. Not moving the file.")
 
 if __name__ == "__main__":
     main()
